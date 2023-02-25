@@ -26,7 +26,7 @@ pub struct TestHandler;
 
 #[async_trait]
 impl EventHandler for TestHandler {
-    async fn handle(&self, req: EventRequest) -> eyre::Result<EventResponse> {
+    async fn handle(&self, _req: EventRequest) -> eyre::Result<EventResponse> {
         todo!()
     }
 }
