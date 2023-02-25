@@ -1,4 +1,7 @@
-use gitevents_sdk::events::{EventRequest, EventResponse};
+use std::sync::Arc;
+
+use async_trait::async_trait;
+use gitevents_sdk::events::{EventHandler, EventRequest, EventResponse};
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -8,6 +11,7 @@ async fn main() -> eyre::Result<()> {
             todo!()
         })
         .action(other_action)
+        .add_handler(Arc::new(TestHandler {}))
         .execute()
         .await?;
 
@@ -16,4 +20,13 @@ async fn main() -> eyre::Result<()> {
 
 async fn other_action(_req: EventRequest) -> eyre::Result<EventResponse> {
     todo!()
+}
+
+pub struct TestHandler;
+
+#[async_trait]
+impl EventHandler for TestHandler {
+    async fn handle(&self, req: EventRequest) -> eyre::Result<EventResponse> {
+        todo!()
+    }
 }

@@ -31,6 +31,11 @@ impl Builder {
         self
     }
 
+    pub fn add_handler(mut self, handler: Arc<dyn EventHandler + Send + Sync>) -> Self {
+        self.handlers.push(handler);
+        self
+    }
+
     pub async fn execute(self) -> eyre::Result<()> {
         Ok(())
     }
