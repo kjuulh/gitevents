@@ -6,6 +6,7 @@ use tokio::task::JoinSet;
 use tokio_cron_scheduler::{Job, JobScheduler};
 
 use crate::events::{EventHandler, EventRequest};
+use crate::git::GitProvider;
 
 #[derive(Clone, Debug)]
 pub struct SchedulerOpts {
@@ -32,27 +33,24 @@ impl CronExecutor {
 
     pub async fn run(
         &self,
-        url: &str,
+        git_providers: &Vec<Arc<dyn GitProvider + Send + Sync>>,
         handlers: &HashMap<uuid::Uuid, Arc<dyn EventHandler + Send + Sync>>,
     ) -> eyre::Result<()> {
         let sched = JobScheduler::new().await?;
 
         let handlers = handlers.clone();
-        let url = url.to_string();
+        let git_providers = git_providers.clone();
 
         let job = Job::new_repeated_async(self.opts.duration, move |uuid, _l| {
             let handlers = handlers.clone();
-            let url = url.clone();
+            let git_providers = git_providers.clone();
             Box::pin(async move {
-                println!("cron-{uuid}: pulling: {}", &url);
-
+                tracing::trace!(uuid = uuid.to_string(), "executing job");
                 let mut js: JoinSet<eyre::Result<()>> = JoinSet::new();
 
                 for (uuid, handler) in handlers {
-                    let url = url.clone();
-
                     js.spawn(async move {
-                        println!("handler-{uuid}: handling: {}", &url);
+                        tracing::trace!(uuid = uuid.to_string(), "executing task");
                         handler.handle(EventRequest {}).await?;
 
                         Ok(())

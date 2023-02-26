@@ -6,21 +6,28 @@ use futures::{Future, FutureExt};
 use crate::action_event_handler::ActionEventHandler;
 use crate::cron::{CronExecutor, SchedulerOpts};
 use crate::events::{ActionFunc, EventHandler, EventRequest, EventResponse};
+use crate::git::generic::GitGeneric;
+use crate::git::GitProvider;
 
 #[allow(dead_code)]
 pub struct Builder {
-    url: String,
+    git_providers: Vec<Arc<dyn GitProvider + Send + Sync>>,
     handlers: HashMap<uuid::Uuid, Arc<dyn EventHandler + Send + Sync>>,
     scheduler_opts: SchedulerOpts,
 }
 
 impl Builder {
-    pub fn new(url: impl Into<String>) -> Self {
+    pub fn new() -> Self {
         Self {
-            url: url.into(),
+            git_providers: Default::default(),
             handlers: HashMap::new(),
             scheduler_opts: Default::default(),
         }
+    }
+
+    pub fn set_generic_git_url(mut self, url: impl Into<String>) -> Self {
+        self.git_providers.push(Arc::new(GitGeneric::new(url)));
+        self
     }
 
     pub fn set_scheduler_opts(mut self, opts: &SchedulerOpts) -> Self {
@@ -49,7 +56,7 @@ impl Builder {
 
     pub async fn execute(self) -> eyre::Result<()> {
         CronExecutor::new(self.scheduler_opts)
-            .run(&self.url, &self.handlers)
+            .run(&self.git_providers, &self.handlers)
             .await?;
 
         tokio::signal::ctrl_c().await.and_then(|_| {
