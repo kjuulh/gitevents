@@ -2,10 +2,11 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
-use gitevents_sdk::cron::SchedulerOpts;
-use gitevents_sdk::events::{EventHandler, EventRequest, EventResponse};
-use gitevents_sdk::git::simulated::GitSimulated;
-use gitevents_sdk::git::GitEvent;
+use gitevents_sdk::{
+    cron::SchedulerOpts,
+    events::{EventHandler, EventRequest, EventResponse},
+    git::{simulated::GitSimulated, GitEvent},
+};
 use tokio::sync::Mutex;
 use tracing::Level;
 
