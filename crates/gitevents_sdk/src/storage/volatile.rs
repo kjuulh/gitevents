@@ -105,7 +105,7 @@ mod test {
     #[tokio::test]
     #[traced_test]
     async fn test_volatile_storage_is_created_and_cleaned_up() {
-        let mut storage = VolatileStorage::new();
+        let storage = VolatileStorage::new();
         storage.allocate().await.unwrap();
 
         let inner = storage.inner.lock().await;

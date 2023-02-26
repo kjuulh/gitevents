@@ -2,7 +2,7 @@ use std::process::Stdio;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use tokio::io::{AsyncBufReadExt, BufReader, Stdout};
+use tokio::io::{AsyncBufReadExt, BufReader};
 
 use crate::storage::volatile::VolatileStorage;
 use crate::storage::DynStorage;
