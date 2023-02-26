@@ -1,8 +1,12 @@
 use async_trait::async_trait;
 use futures::future::BoxFuture;
 
+use crate::git::GitEvent;
+
 #[derive(Debug, Clone)]
-pub struct EventRequest {}
+pub struct EventRequest {
+    pub git: GitEvent,
+}
 
 #[derive(Debug, Clone)]
 pub struct EventResponse {}

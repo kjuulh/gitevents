@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use futures::{Future, FutureExt};
+use tokio::sync::Mutex;
 
 use crate::action_event_handler::ActionEventHandler;
 use crate::cron::{CronExecutor, SchedulerOpts};
@@ -11,7 +12,7 @@ use crate::git::GitProvider;
 
 #[allow(dead_code)]
 pub struct Builder {
-    git_providers: Vec<Arc<dyn GitProvider + Send + Sync>>,
+    git_providers: Vec<Arc<Mutex<dyn GitProvider + Send + Sync>>>,
     handlers: HashMap<uuid::Uuid, Arc<dyn EventHandler + Send + Sync>>,
     scheduler_opts: SchedulerOpts,
 }
@@ -26,7 +27,16 @@ impl Builder {
     }
 
     pub fn set_generic_git_url(mut self, url: impl Into<String>) -> Self {
-        self.git_providers.push(Arc::new(GitGeneric::new(url)));
+        self.git_providers
+            .push(Arc::new(Mutex::new(GitGeneric::new(url))));
+        self
+    }
+
+    pub fn add_git_provider(
+        mut self,
+        git_provider: Arc<Mutex<dyn GitProvider + Send + Sync>>,
+    ) -> Self {
+        self.git_providers.push(git_provider);
         self
     }
 

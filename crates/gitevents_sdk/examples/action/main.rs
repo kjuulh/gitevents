@@ -4,6 +4,9 @@ use std::time::Duration;
 use async_trait::async_trait;
 use gitevents_sdk::cron::SchedulerOpts;
 use gitevents_sdk::events::{EventHandler, EventRequest, EventResponse};
+use gitevents_sdk::git::simulated::GitSimulated;
+use gitevents_sdk::git::GitEvent;
+use tokio::sync::Mutex;
 use tracing::Level;
 
 #[tokio::main]
@@ -13,11 +16,17 @@ async fn main() -> eyre::Result<()> {
         .with_max_level(Level::TRACE)
         .init();
 
-    gitevents_sdk::listen("something")
+    let simulated_git = GitSimulated::new()
+        .insert(GitEvent {})
+        .insert(GitEvent {})
+        .insert(GitEvent {});
+
+    gitevents_sdk::builder::Builder::new()
+        .add_git_provider(Arc::new(Mutex::new(simulated_git)))
         .set_scheduler_opts(&SchedulerOpts {
             duration: Duration::from_secs(2),
         })
-        .action(|req| async move { Ok(EventResponse {}) })
+        .action(|_req| async move { Ok(EventResponse {}) })
         .action(other_action)
         .add_handler(Arc::new(TestHandler {}))
         .execute()
