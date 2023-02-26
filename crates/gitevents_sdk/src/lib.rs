@@ -3,6 +3,7 @@ pub mod builder;
 pub mod cron;
 pub mod events;
 pub mod git;
+mod storage;
 
 use self::builder::Builder;
 
