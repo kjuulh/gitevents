@@ -25,7 +25,8 @@ async fn main() -> eyre::Result<()> {
     gitevents_sdk::builder::Builder::new()
         .add_git_provider(Arc::new(Mutex::new(simulated_git)))
         .set_scheduler_opts(&SchedulerOpts {
-            duration: Duration::from_secs(2),
+            // Duration must not be lower than 1 second, otherwise async runtime won't proceed
+            duration: Duration::from_secs(1),
         })
         .action(|_req| async move { Ok(EventResponse {}) })
         .action(other_action)
