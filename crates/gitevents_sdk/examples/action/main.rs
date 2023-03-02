@@ -18,9 +18,15 @@ async fn main() -> eyre::Result<()> {
         .init();
 
     let simulated_git = GitSimulated::new()
-        .insert(GitEvent {})
-        .insert(GitEvent {})
-        .insert(GitEvent {});
+        .insert(GitEvent {
+            commit: "something1".into(),
+        })
+        .insert(GitEvent {
+            commit: "something2".into(),
+        })
+        .insert(GitEvent {
+            commit: "something3".into(),
+        });
 
     gitevents_sdk::builder::Builder::new()
         .add_git_provider(Arc::new(Mutex::new(simulated_git)))

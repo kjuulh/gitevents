@@ -16,10 +16,10 @@ async fn main() -> eyre::Result<()> {
         .init();
 
     gitevents_sdk::builder::Builder::new()
-        .set_generic_git_url("kjuulh/gitevents")
+        .set_generic_git_url("git@git.front.kjuulh.io:kjuulh/gitevents.git")
         .set_scheduler_opts(&SchedulerOpts {
             // Duration must not be lower than 1 second, otherwise async runtime won't proceed
-            duration: Duration::from_secs(1),
+            duration: Duration::from_secs(10),
         })
         .action(|_req| async move { Ok(EventResponse {}) })
         .action(other_action)

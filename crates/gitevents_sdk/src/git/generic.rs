@@ -80,9 +80,9 @@ impl GitProvider for GitGeneric {
                             let revstr = rev?.to_string();
                             tracing::trace!(progress = &revstr, "storing progress");
                             dbg!(&revstr);
-                            *p = revstr;
+                            *p = revstr.clone();
 
-                            return Ok(Some(GitEvent {}));
+                            return Ok(Some(GitEvent { commit: revstr }));
                         }
                     }
                     None => {
@@ -205,7 +205,20 @@ mod tests {
         assert!(event.is_some());
         assert!(logs_contain("git pull finished"));
         assert!(logs_contain("err: git pull"));
-        assert!(logs_contain("storing progress123"));
+        assert!(logs_contain("storing progress"));
+
+        let mut file_path3 = tempdir.clone();
+        file_path3.push("readme3.md");
+        write(file_path3, "Some file123").unwrap();
+
+        git_commit_all(&tempdir, "next commit 4").await.unwrap();
+
+        let event = git.listen().await.unwrap();
+
+        assert!(event.is_some());
+        assert!(logs_contain("git pull finished"));
+        assert!(logs_contain("err: git pull"));
+        assert!(logs_contain("storing progress"));
 
         remove_dir_all(tempdir).await.unwrap();
     }

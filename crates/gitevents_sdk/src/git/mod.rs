@@ -4,7 +4,9 @@ pub mod simulated;
 use async_trait::async_trait;
 
 #[derive(Debug, Clone)]
-pub struct GitEvent {}
+pub struct GitEvent {
+    pub commit: String,
+}
 
 #[async_trait]
 pub trait GitProvider {
