@@ -68,7 +68,7 @@ impl GitProvider for GitGeneric {
                 let mut p = self.progress.lock().await;
                 match p.as_mut() {
                     Some(p) => {
-                        let repo = Repository::open(path)?;
+                        let repo = Repository::open(path.clone())?;
                         let head = repo.head()?.target().unwrap();
                         let mut revwalk = repo.revwalk()?;
                         revwalk.set_sorting(git2::Sort::NONE)?; //| git2::Sort::REVERSE)?;
@@ -79,10 +79,12 @@ impl GitProvider for GitGeneric {
                         if let Some(rev) = revwalk.next() {
                             let revstr = rev?.to_string();
                             tracing::trace!(progress = &revstr, "storing progress");
-                            dbg!(&revstr);
                             *p = revstr.clone();
 
-                            return Ok(Some(GitEvent { commit: revstr }));
+                            return Ok(Some(GitEvent {
+                                commit: revstr,
+                                path: path.clone(),
+                            }));
                         }
                     }
                     None => {
@@ -140,17 +142,18 @@ impl GitProvider for GitGeneric {
                         "inconsistency found, object should not already have progress stored"
                     ),
                     None => {
-                        let repo = Repository::open(path)?;
+                        let repo = Repository::open(path.clone())?;
                         let head = repo.head()?;
                         let revstr = head.target().unwrap().to_string();
                         tracing::trace!(progress = &revstr, "storing progress");
-                        *p = Some(revstr);
+                        *p = Some(revstr.clone());
+
+                        return Ok(Some(GitEvent {
+                            commit: revstr,
+                            path: path.clone(),
+                        }));
                     }
                 }
-
-                drop(p);
-
-                Ok(None)
             }
         }
     }
