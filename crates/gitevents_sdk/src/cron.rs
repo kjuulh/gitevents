@@ -43,6 +43,25 @@ impl CronExecutor {
 
         let (tx, mut rx) = tokio::sync::broadcast::channel::<GitEvent>(2);
 
+        let mut clone_js: JoinSet<eyre::Result<()>> = JoinSet::new();
+
+        for provider in git_providers.clone() {
+            let tx = tx.clone();
+
+            clone_js.spawn(async move {
+                tracing::trace!("syncing git_provider");
+                if let Some(event) = provider.lock().await.listen().await? {
+                    tx.send(event).unwrap();
+                }
+
+                Ok(())
+            });
+        }
+
+        while let Some(task) = clone_js.join_next().await {
+            task.unwrap().unwrap();
+        }
+
         let job = Job::new_repeated_async(self.opts.duration, move |uuid, _l| {
             let git_providers = git_providers.clone();
             let tx = tx.clone();
