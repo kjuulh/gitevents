@@ -6,13 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.64"
-eyre = "0.6.8"
+async-trait = "0.1.79"
+eyre = "0.6.12"
 futures = "0.3.26"
-git2 = { version = "0.16.1", features = ["vendored-libgit2", "vendored-openssl"] }
-tokio = { version = "1.25.0", features = ["full"] }
-tokio-cron-scheduler = { version = "0.9.4", features = ["signal"] }
-tracing = { version = "0.1.37", features = ["log", "async-await"] }
-tracing-subscriber = { version = "0.3.16", features = ["tracing", "json"] }
+git2 = { version = "0.18.3", features = ["vendored-libgit2", "vendored-openssl"] }
+tokio = { version = "1.37.0", features = ["full"] }
+tokio-cron-scheduler = { version = "0.10.0", features = ["signal"] }
+tracing = { version = "0.1.40", features = ["log", "async-await"] }
+tracing-subscriber = { version = "0.3.18", features = ["tracing", "json"] }
 tracing-test = "0.2.4"
-uuid = { version = "1.3.0", features = ["v4"] }
+uuid = { version = "1.8.0", features = ["v4"] }
